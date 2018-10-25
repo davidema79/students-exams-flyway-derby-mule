@@ -20,6 +20,7 @@ uses:
         ResourcePathName : "professor"
         ResourceType : commonTypes.professor
     get:
+    
     /exams:
       type:
         commonResourceType.collection:
@@ -31,7 +32,18 @@ uses:
       ResourcePathName : "subjects"
       ResourceType : commonTypes.subjects-list
   get:
-
+  
+  /{ID}:
+    type:
+      commonResourceType.collection-item:
+        ResourcePathName : "subjects"
+        ResourceType : commonTypes.subject
+    get:
+    /exams:
+      type:
+        commonResourceType.collection:
+          ResourcePathName : "subjects"
+          ResourceType : commonTypes.subjects-list
 /students:
   type:
     commonResourceType.collection:
