@@ -14,25 +14,30 @@ http://www.mulesoft.org/schema/mule/apikit http://www.mulesoft.org/schema/mule/a
         <apikit:console config-ref="api-config" doc:name="APIkit Console" />
     </flow>
     <flow name="get:/subjects:api-config">
-        <set-payload value="#[NullPayload.getInstance()]" doc:name="Set Payload"/>
+         <flow-ref name="get-all-subjects-flow" doc:name="get-all-subjects-flow - flowReference"/>
+    </flow>
+    <flow name="get:/subjects/{ID}:api-config">
+         <flow-ref name="get-subject-by-id-flow" doc:name="get-subject-by-id-flow - flowReference"/>
+    </flow>
+    <flow name="get:/subjects/{ID}/exams:api-config">
+         <flow-ref name="get-all-exams-per-subjects-flow" doc:name="get-all-exams-per-subjects-flow - flowReference"/>
     </flow>
     <flow name="get:/students:api-config">
-        <set-payload value="#[NullPayload.getInstance()]" doc:name="Set Payload"/>
         <flow-ref name="get-all-students-flow" doc:name="get-student-by-id-flow - flowReference"/>
     </flow>
     <flow name="get:/students/{ID}:api-config">
         <flow-ref name="get-student-by-id-flow" doc:name="get-student-by-id-flow - flowReference"/>
     </flow>
     <flow name="get:/students/{ID}/exams:api-config">
-        <set-payload value="#[NullPayload.getInstance()]" doc:name="Set Payload"/>
+    		<flow-ref name="get-student-exams-flow" doc:name="get-student-exams-flow - flowReference"/>
     </flow>
     <flow name="get:/professors:api-config">
-        <set-payload value="#[NullPayload.getInstance()]" doc:name="Set Payload"/>
+        <flow-ref name="get-all-professors-flow" doc:name="get-all-professors-flow - flowReference"/>
     </flow>
     <flow name="get:/professors/{ID}:api-config">
-        <set-payload value="#[NullPayload.getInstance()]" doc:name="Set Payload"/>
+        <flow-ref name="get-professor-by-id-flow" doc:name="get-professor-by-id-flow - flowReference"/>
     </flow>
     <flow name="get:/professors/{ID}/exams:api-config">
-        <set-payload value="#[NullPayload.getInstance()]" doc:name="Set Payload"/>
+        <flow-ref name="get-professor-exams-flow" doc:name="get-professor-exams-flow - flowReference"/>
     </flow>
 </mule>
