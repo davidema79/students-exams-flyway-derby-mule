@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+	<context:property-placeholder location="classpath:application.properties"/>
+	
+	<spring:beans>
+
+		<spring:bean id="standardXADataSource" class="org.enhydra.jdbc.standard.StandardXADataSource" destroy-method="shutdown" name="XADataSource" scope="singleton">
+        		<spring:property name="driverName" value="${db.driverClass}"/>
+			<spring:property name="url" value="${db.url}"/>
+		</spring:bean>
+ 		
+ 		<spring:bean id="flyway" class="org.flywaydb.core.Flyway" init-method="migrate">
+	    		<spring:property name="dataSource" ref="standardXADataSource"/>
+		</spring:bean>
+		 
+    </spring:beans>
+	
+    <db:generic-config name="databaseGlobalConfiguration" dataSource-ref="standardXADataSource" doc:name="Generic Database Configuration"/>
+    
+    <http:listener-config name="api-httpListenerConfig" host="${server.host}" port="${server.port}" doc:name="HTTP Listener Configuration"/>
+	
+</mule>
