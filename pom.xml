@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>it.davidemartorana.mule.demo.students</groupId>
@@ -14,7 +13,11 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
 		<mule.version>3.9.1</mule.version>
-    	<mule.tools.version>1.7</mule.tools.version>
+    	    <mule.tools.version>1.7</mule.tools.version>
+    	    
+    	    <flyway-core.version>5.1.4</flyway-core.version>
+        <org.apache.derby.version>10.14.2.0</org.apache.derby.version>
+        <spring-jdbc.version>4.1.9.RELEASE</spring-jdbc.version>
 	</properties>
 
 	<build>
@@ -118,6 +121,25 @@
 			<version>${mule.version}</version>
 			<scope>provided</scope>
 		</dependency>
+		
+	    <dependency>
+			<groupId>org.apache.derby</groupId>
+			<artifactId>derby</artifactId>
+			<version>${org.apache.derby.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+			<version>${spring-jdbc.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-core</artifactId>
+			<version>${flyway-core.version}</version>
+		</dependency>
+		
 		<!-- for testing -->
 		<dependency>
 			<groupId>org.mule.tests</groupId>
