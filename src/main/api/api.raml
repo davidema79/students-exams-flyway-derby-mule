@@ -1,0 +1,52 @@
+#%RAML 1.0
+title: Students Exams
+version: v1.0
+mediaType: application/json
+
+uses:
+  commonResourceType: ./resourceTypes/commonResourceTypes.raml
+  commonTypes: ./types/commonTypesLibrary.raml
+
+/professors:
+  type:
+    commonResourceType.collection:
+      ResourcePathName : "professors"
+      ResourceType : commonTypes.professors-list
+  get:
+
+  /{ID}:
+    type:
+      commonResourceType.collection-item:
+        ResourcePathName : "professor"
+        ResourceType : commonTypes.professor
+    get:
+    /exams:
+      type:
+        commonResourceType.collection:
+          ResourcePathName : "exams"
+          ResourceType : commonTypes.exams-list
+/subjects:
+  type:
+    commonResourceType.collection:
+      ResourcePathName : "subjects"
+      ResourceType : commonTypes.subjects-list
+  get:
+
+/students:
+  type:
+    commonResourceType.collection:
+      ResourcePathName : "students"
+      ResourceType : commonTypes.students-list
+  get:
+
+  /{ID}:
+    type:
+      commonResourceType.collection-item:
+        ResourcePathName : "student"
+        ResourceType : commonTypes.student
+
+    /exams:
+      type:
+        commonResourceType.collection:
+          ResourcePathName : "exams"
+          ResourceType : commonTypes.exams-students-list
