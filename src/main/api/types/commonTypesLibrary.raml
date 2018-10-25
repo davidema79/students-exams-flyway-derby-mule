@@ -1,0 +1,33 @@
+#%RAML 1.0 Library
+
+types:
+  professor:
+    type: !include ./professor.raml
+
+  student:
+    type: !include ./student.raml
+
+  professors-list:
+    type: array
+    items:
+      type: !include ./professor.raml
+
+  students-list:
+    type: array
+    items:
+      type: !include ./student.raml
+
+  subjects-list:
+    type: array
+    items:
+      type: !include ./subject.raml
+
+  exams-list:
+    type: array
+    items:
+      type: !include ./exam.raml
+
+  exams-students-list:
+    type: array
+    items:
+      type: !include ./exam-student.raml
