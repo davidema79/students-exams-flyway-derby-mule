@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:spring="http://www.springframework.org/schema/beans" xmlns:core="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+    <munit:config name="munit" doc:name="MUnit configuration"/>
+    
+    <spring:beans>
+        <spring:import resource="classpath:students.xml"/>
+        <spring:import resource="classpath:configs/test-global-config.xml"/>
+    </spring:beans>
+    
+    <munit:test name="new-test-suite-get-all-students-flowTest" description="Test">
+        <flow-ref name="get-all-students-flow" doc:name="Flow-ref to get-all-students-flow"/>
+        <munit:assert-not-null doc:name="Assert Not Null Payload"/>
+    </munit:test>
+    <munit:test name="new-test-suite-get-student-by-id-flowTest" description="Test">
+        <munit:set payload="#[]" doc:name="Set Message">
+            <munit:inbound-properties>
+                <munit:inbound-property key="http.uri.params" value="#[['ID':3]]" encoding="UTF-8" mimeType="text/plain"/>
+            </munit:inbound-properties>
+        </munit:set>
+        <flow-ref name="get-student-by-id-flow" doc:name="Flow-ref to get-student-by-id-flow"/>
+        <munit:assert-not-null doc:name="Assert Not Null Payload"/>
+    </munit:test>
+    <munit:test name="new-test-suite-get-student-exams-flowTest" description="Test">
+        <munit:set payload="#[]" doc:name="Set Message">
+            <munit:inbound-properties>
+                <munit:inbound-property key="http.uri.params" value="#[['ID':4]]" encoding="UTF-8" mimeType="text/plain"/>
+            </munit:inbound-properties>
+        </munit:set>
+        <flow-ref name="get-student-exams-flow" doc:name="Flow-ref to get-student-exams-flow"/>
+        <munit:assert-not-null doc:name="Assert Not Null Payload"/>
+    </munit:test>
+</mule>
