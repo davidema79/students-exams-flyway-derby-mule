@@ -1,10 +1,14 @@
 # Students Exams Flyway Derby Mule
+
 Table of Contents
 =================
 1. [Introduction](#introduction)
 1. [Disclaimer](#disclaimer)
 1. [Project Description](#project-description)
-   1. [Structure](#structure)
+   1. [Common Structure](#common-structure)
+   1. [Main Branch](#main-branch)
+   1. [Test Branch](#test-branch)
+1. [How to Run](#how-to-run)
 
 
 ## Introduction
