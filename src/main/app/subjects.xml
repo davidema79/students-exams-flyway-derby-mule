@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.9.1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd 
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd 
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+   <flow name="get-all-subjects-flow">
+        <logger level="INFO" doc:name="Logger"/>
+        <db:select config-ref="databaseGlobalConfiguration" doc:name="Select All Subjects">
+            <db:parameterized-query><![CDATA[SELECT *
+FROM subjects]]></db:parameterized-query>
+        </db:select>
+        <dw:transform-message doc:name="Transform Message">
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/json
+---
+payload map {
+	name: $.NAME,
+	id: $.id
+}]]></dw:set-payload>
+        </dw:transform-message>
+    </flow>
+    
+   <flow name="get-subject-by-id-flow">
+        <logger level="INFO" doc:name="Logger"/>
+        <set-variable variableName="subjectId" value="#[message.inboundProperties['http.uri.params']['ID']]" doc:name="Variable"/>
+        <logger message="#['Variable :' + flowVars.subjectId + ' Request URI:' + message.inboundProperties.'http.uri.params'] " level="INFO" doc:name="Logger"/>
+        <db:select config-ref="databaseGlobalConfiguration" doc:name="Select Subject by ID">
+            <db:parameterized-query><![CDATA[SELECT *
+FROM subjects
+WHERE id = #[flowVars.subjectId]]]></db:parameterized-query>
+        </db:select>
+        <choice doc:name="Choice">
+            <when expression="#[payload.size() &gt; 0 ]">
+		        <dw:transform-message doc:name="Transform Message">
+		            <dw:set-payload><![CDATA[%dw 1.0
+%output application/json
+---
+payload map {
+	name: $.NAME,
+	id: $.id
+}]]>
+					</dw:set-payload>
+       			</dw:transform-message>
+            </when>
+            <otherwise>
+                <scripting:component doc:name="Professor Not Found ">
+                    <scripting:script engine="Groovy"><![CDATA[throw new org.mule.module.apikit.exception.NotFoundException('Subject does not exists')]]></scripting:script>
+                </scripting:component>
+            </otherwise>
+        </choice>
+    </flow>
+    
+    <flow name="get-all-exams-per-subjects-flow">
+        <logger level="INFO" doc:name="Logger"/>
+        <set-variable variableName="subjectId" value="#[message.inboundProperties['http.uri.params']['ID']]" doc:name="Variable"/>
+        <logger message="#['Variable :' + flowVars.subjectId + ' Request URI:' + message.inboundProperties.'http.uri.params'] " level="INFO" doc:name="Logger"/>
+        <db:select config-ref="databaseGlobalConfiguration" doc:name="Select All Subjects">
+            <db:parameterized-query><![CDATA[SELECT s.*
+FROM subjects s JOIN exams e ON s.id = e.subject_id
+WHERE s.id = #[flowVars.subjectId]]]></db:parameterized-query>
+        </db:select>
+        <choice doc:name="Choice">
+            <when expression="#[payload.size() &gt; 0 ]">
+		        <dw:transform-message doc:name="Transform Message">
+		            <dw:set-payload><![CDATA[%dw 1.0
+%output application/json
+---
+payload map {
+	name: $.NAME,
+	exam: {
+		date: $.DATE_EXAM,
+		professor: 'NULL'
+	}
+}]]>
+					</dw:set-payload>
+       			</dw:transform-message>
+            </when>
+            <otherwise>
+                <scripting:component doc:name="Professor Not Found ">
+                    <scripting:script engine="Groovy"><![CDATA[throw new org.mule.module.apikit.exception.NotFoundException('Subject does not exists')]]></scripting:script>
+                </scripting:component>
+            </otherwise>
+        </choice>
+    </flow>
+
+
+</mule>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:spring="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/apikit http://www.mulesoft.org/schema/mule/apikit/current/mule-apikit.xsd">
+    <apikit:config name="api-config" raml="api.raml" consoleEnabled="false" doc:name="Router" />
+    <flow name="api-main">
+        <http:listener config-ref="api-httpListenerConfig" path="/api/*" doc:name="HTTP" />
+        <apikit:router config-ref="api-config" doc:name="APIkit Router" />
+        <exception-strategy ref="api-apiKitGlobalExceptionMapping" doc:name="Reference Exception Strategy" />
+    </flow>
+    <flow name="api-console">
+        <http:listener config-ref="api-httpListenerConfig" path="/console/*" doc:name="HTTP" />
+        <apikit:console config-ref="api-config" doc:name="APIkit Console" />
+    </flow>
+    <flow name="get:/subjects:api-config">
+         <flow-ref name="get-all-subjects-flow" doc:name="get-all-subjects-flow - flowReference"/>
+    </flow>
+    <flow name="get:/subjects/{ID}:api-config">
+         <flow-ref name="get-subject-by-id-flow" doc:name="get-subject-by-id-flow - flowReference"/>
+    </flow>
+    <flow name="get:/subjects/{ID}/exams:api-config">
+         <flow-ref name="get-all-exams-per-subjects-flow" doc:name="get-all-exams-per-subjects-flow - flowReference"/>
+    </flow>
+    <flow name="get:/students:api-config">
+        <flow-ref name="get-all-students-flow" doc:name="get-student-by-id-flow - flowReference"/>
+    </flow>
+    <flow name="get:/students/{ID}:api-config">
+        <flow-ref name="get-student-by-id-flow" doc:name="get-student-by-id-flow - flowReference"/>
+    </flow>
+    <flow name="get:/students/{ID}/exams:api-config">
+    		<flow-ref name="get-student-exams-flow" doc:name="get-student-exams-flow - flowReference"/>
+    </flow>
+    <flow name="get:/professors:api-config">
+        <flow-ref name="get-all-professors-flow" doc:name="get-all-professors-flow - flowReference"/>
+    </flow>
+    <flow name="get:/professors/{ID}:api-config">
+        <flow-ref name="get-professor-by-id-flow" doc:name="get-professor-by-id-flow - flowReference"/>
+    </flow>
+    <flow name="get:/professors/{ID}/exams:api-config">
+        <flow-ref name="get-professor-exams-flow" doc:name="get-professor-exams-flow - flowReference"/>
+    </flow>
+</mule>

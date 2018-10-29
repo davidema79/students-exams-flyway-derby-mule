@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd">
+    <flow name="get-all-students-flow">
+        <logger level="INFO" doc:name="Logger"/>
+        <db:select config-ref="databaseGlobalConfiguration" doc:name="Select All students">
+            <db:parameterized-query><![CDATA[SELECT *
+FROM students]]></db:parameterized-query>
+        </db:select>
+        <dw:transform-message doc:name="Transform Message">
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/json
+---
+payload map {
+	name: $.NAME,
+	lastName: $.LAST_NAME,
+	id: $.id
+}]]></dw:set-payload>
+        </dw:transform-message>
+    </flow>
+    
+        <flow name="get-student-by-id-flow">
+        <set-variable variableName="studentId" value="#[message.inboundProperties['http.uri.params']['ID']]" doc:name="Variable"/>
+        <logger message="#['Variable :' + flowVars.studentId + ' Request URI:' + message.inboundProperties.'http.uri.params'] " level="INFO" doc:name="Logger"/>
+        <db:select config-ref="databaseGlobalConfiguration" doc:name="Select student by ID">
+            <db:parameterized-query><![CDATA[SELECT *
+FROM students
+WHERE id = #[flowVars.studentId]]]></db:parameterized-query>
+        </db:select>
+        <choice doc:name="Choice">
+            <when expression="#[payload.size() &gt; 0 ]">
+                <dw:transform-message doc:name="Transform Message">
+                    <dw:set-payload><![CDATA[%dw 1.0
+%output application/json
+---
+{
+	name: payload[0].NAME,
+	lastName: payload[0].LAST_NAME	
+}]]></dw:set-payload>
+                </dw:transform-message>
+            </when>
+            <otherwise>
+                <scripting:component doc:name="Student Not Found ">
+                    <scripting:script engine="Groovy"><![CDATA[throw new org.mule.module.apikit.exception.NotFoundException('Student does not exists')]]></scripting:script>
+                </scripting:component>
+            </otherwise>
+        </choice>
+    </flow>
+    
+    <flow name="get-student-exams-flow">
+        <set-variable variableName="studentId" value="#[message.inboundProperties['http.uri.params']['ID']]" doc:name="Variable"/>
+        <logger message="#['Variable :' + flowVars.studentId + ' Request URI:' + message.inboundProperties.'http.uri.params'] " level="INFO" doc:name="Logger"/>
+        <db:select config-ref="databaseGlobalConfiguration" doc:name="Select exams by Student ID">
+            <db:parameterized-query><![CDATA[SELECT e.*, es.result, sbj.name
+FROM students s JOIN exams_students es ON s.id = es.student_id
+                JOIN exams e ON e.id = es.exam_id
+                JOIN subjects sbj ON sbj.id = e.subject_id
+WHERE s.id = #[flowVars.studentId]]]></db:parameterized-query>
+        </db:select>
+        <choice doc:name="Choice">
+            <when expression="#[payload.size() &gt; 0 ]">
+                <dw:transform-message doc:name="Transform Message">
+                    <dw:set-payload><![CDATA[%dw 1.0
+%output application/json
+---
+payload map {
+	subjectNname: $.NAME,
+	examDate: $.DATE_EXAM,
+	result: $.RESULT	
+}]]></dw:set-payload>
+                </dw:transform-message>
+            </when>
+            <otherwise>
+                <scripting:component doc:name="Student Not Found ">
+                    <scripting:script engine="Groovy"><![CDATA[throw new org.mule.module.apikit.exception.NotFoundException('Student does not exists')]]></scripting:script>
+                </scripting:component>
+            </otherwise>
+        </choice>
+    </flow>
+    
+</mule>

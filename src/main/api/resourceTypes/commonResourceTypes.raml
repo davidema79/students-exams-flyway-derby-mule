@@ -1,0 +1,30 @@
+#%RAML 1.0 Library 
+
+resourceTypes:
+  collection:
+    description: Collection of all <<ResourcePathName>>
+    get:
+      description: |
+        Retrieves all the <<ResourcePathName>> available in Orion
+      responses:
+        200:
+          description: |
+            Succesfully all the <<ResourcePathName>>
+          body:
+            application/json:
+              type: <<ResourceType>>
+              
+  collection-item:
+      get:
+        description: |
+          Retrieves <<ResourcePathName | !singularize>>
+          with <<resourcePathName|!singularize>>Id =
+          {<<resourcePathName|!singularize>>Id}
+        responses:
+          200:
+            description: |
+              Succesfully all the <<ResourcePathName>>
+            body:
+              application/json:
+                type: <<ResourceType>>
+                
