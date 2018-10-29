@@ -25,8 +25,8 @@ Please refer the respective branches for further details, and the blog post abov
 In both branches the project structure is the same.
 This is a REST API Project implements a very simplified API that exposes university info about the students, the subjects, the professors and the exams. It **does not aim** to give you a full-featured API, but just an example about the usage of embedded Database and a simple way to create and populate it.
 
-### Structure
-It is a normal Mule project based on Maven, and use Api-Kit. In particular it contains:
+### Common Structure
+It is a normal Mule project based on Maven, and use Api-Kit.
 1. `src/main/api` package in which the API definition is contained
 1. `src/main/app` package in which the flow files are contained:
    * `api.xml` the entry-point;
@@ -36,6 +36,9 @@ It is a normal Mule project based on Maven, and use Api-Kit. In particular it co
    * `global-config.xml` that contains the application configuration
    * `global-error-handler.xml` that contains the error handling flow.
 
+### Main Branch
+
+### Test Branch
 In the `develop-test` branch there are also the following packages:
 1. `src/test/munit` that contains the tests-suite
 1. `src/test/munit/config` that contains the application configuration to use during the test phase.
