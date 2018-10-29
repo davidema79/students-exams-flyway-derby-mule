@@ -40,4 +40,7 @@ http://www.mulesoft.org/schema/mule/apikit http://www.mulesoft.org/schema/mule/a
     <flow name="get:/professors/{ID}/exams:api-config">
         <flow-ref name="get-professor-exams-flow" doc:name="get-professor-exams-flow - flowReference"/>
     </flow>
+    <flow name="get:/professors/{ID}/subjects:api-config">
+        <flow-ref name="get-professor-subjects-flow" doc:name="get-professor-subjects-flow - flowReference"/>
+    </flow>
 </mule>

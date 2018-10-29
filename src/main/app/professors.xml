@@ -4,12 +4,12 @@
 	xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw"
 	xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
 	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.9.1"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="
-http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd 
-http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd 
-http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
 
@@ -75,8 +75,39 @@ WHERE p.id = #[flowVars.professorId]]]></db:parameterized-query>
 %output application/json
 ---
 payload map {
-	subjectNname: $.NAME,
-	examDate: $.DATE_EXAM
+	subjectName: $.NAME,
+	examDate: $.DATE_EXAM as :string {format: 'yyyy-MM-dd'}
+}]]></dw:set-payload>
+                </dw:transform-message>
+            </when>
+            <otherwise>
+                <scripting:component doc:name="Professor Not Found ">
+                    <scripting:script engine="Groovy"><![CDATA[throw new org.mule.module.apikit.exception.NotFoundException('Professor does not exists')]]></scripting:script>
+                </scripting:component>
+            </otherwise>
+        </choice>
+    </flow>
+    
+    <flow name="get-professor-subjects-flow">
+        <set-variable variableName="professorId" value="#[message.inboundProperties['http.uri.params']['ID']]" doc:name="Variable"/>
+        <logger message="#['Variable :' + flowVars.professorId + ' Request URI:' + message.inboundProperties.'http.uri.params'] " level="INFO" doc:name="Logger"/>
+        <db:select config-ref="databaseGlobalConfiguration" doc:name="Select exams by Professor ID">
+            <db:parameterized-query><![CDATA[SELECT sbj.*
+FROM professors p JOIN exams e ON p.id = e.professor_id
+                  JOIN subjects sbj ON sbj.id = e.subject_id
+WHERE p.id = #[flowVars.professorId]
+GROUP BY sbj.id, sbj.name
+]]></db:parameterized-query>
+        </db:select>
+        <choice doc:name="Choice">
+            <when expression="#[payload.size() &gt; 0 ]">
+                <dw:transform-message doc:name="Transform Message">
+                    <dw:set-payload><![CDATA[%dw 1.0
+%output application/json
+---
+payload map {
+    id: $.ID,
+	name: $.NAME
 }]]></dw:set-payload>
                 </dw:transform-message>
             </when>

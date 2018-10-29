@@ -4,12 +4,12 @@
 	xmlns:db="http://www.mulesoft.org/schema/mule/db"
 	xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw"
 	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.9.1"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="
-http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd 
-http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd 
-http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
    <flow name="get-all-subjects-flow">
@@ -64,8 +64,9 @@ payload map {
         <set-variable variableName="subjectId" value="#[message.inboundProperties['http.uri.params']['ID']]" doc:name="Variable"/>
         <logger message="#['Variable :' + flowVars.subjectId + ' Request URI:' + message.inboundProperties.'http.uri.params'] " level="INFO" doc:name="Logger"/>
         <db:select config-ref="databaseGlobalConfiguration" doc:name="Select All Subjects">
-            <db:parameterized-query><![CDATA[SELECT s.*
+            <db:parameterized-query><![CDATA[SELECT s.*, e.DATE_EXAM, p.NAME as PROF_NAME, p.LAST_NAME as PROF_LAST_NAME
 FROM subjects s JOIN exams e ON s.id = e.subject_id
+                JOIN professors p ON p.id = e.professor_id
 WHERE s.id = #[flowVars.subjectId]]]></db:parameterized-query>
         </db:select>
         <choice doc:name="Choice">
@@ -77,8 +78,11 @@ WHERE s.id = #[flowVars.subjectId]]]></db:parameterized-query>
 payload map {
 	name: $.NAME,
 	exam: {
-		date: $.DATE_EXAM,
-		professor: 'NULL'
+		date: $.DATE_EXAM as :string {format: 'yyyy-MM-dd'},
+		professor: {
+		    name: $.PROF_NAME,
+		    lastName: $.PROF_LAST_NAME
+		}
 	}
 }]]>
 					</dw:set-payload>

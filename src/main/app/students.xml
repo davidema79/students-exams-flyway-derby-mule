@@ -72,8 +72,8 @@ WHERE s.id = #[flowVars.studentId]]]></db:parameterized-query>
 %output application/json
 ---
 payload map {
-	subjectNname: $.NAME,
-	examDate: $.DATE_EXAM,
+	subjectName: $.NAME,
+	examDate: $.DATE_EXAM as :string {format: 'yyyy-MM-dd'},
 	result: $.RESULT	
 }]]></dw:set-payload>
                 </dw:transform-message>
